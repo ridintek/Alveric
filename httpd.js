@@ -22,13 +22,15 @@ var fso = new ActiveXObject('Scripting.FileSystemObject');
 var ws = new ActiveXObject('WScript.Shell');
 
 var SCRIPT_PATH = fso.getFile(WScript.ScriptFullName).ParentFolder + "\\";
-var SIG_INST = 0;
-var SIG_RELO = 0;
-var SIG_REMO = 0;
-var SIG_RUN  = 0;
-var SIG_STOP = 0;
-var SIG_SVC  = 0;
-var SIG_TEST = 0;
+var SIG_INST = 0; // Install
+var SIG_ONLO = 0; // Onlogon
+var SIG_ONST = 0; // Onstart
+var SIG_RELO = 0; // Reload
+var SIG_REMO = 0; // Remove
+var SIG_RUN  = 0; // Run
+var SIG_STOP = 0; // Stop
+var SIG_SVC  = 0; // Service
+var SIG_TEST = 0; // Test
 
 function echo(str)
 {
@@ -157,45 +159,39 @@ function main(argc, argv)
       if (argv(a) == "--install") {
         SIG_INST = 1;
 
-        if (argc == 2 && argv(a + 1).length > 0) SVC_NAME = argv(a + 1);
-        break;
+        if (argc == 2 && argv(a + 1).length > 0 && argv(a + 1).substr(0, 2) != '--') {
+          SVC_NAME = argv(a + 1);
+        }
       }
+
+      if (argv(a))
 
       if (argv(a) == '--reload') {
         SIG_RELO = 1;
-
-        break;
       }
 
       if (argv(a) == '--remove') {
         SIG_REMO = 1;
 
-        if (argc == 2 && argv(a + 1).length > 0) SVC_NAME = argv(a + 1);
-        break;
+        if (argc == 2 && argv(a + 1).length > 0 && argv(a + 1).substr(0, 2) != '--') {
+          SVC_NAME = argv(a + 1);
+        }
       }
 
       if (argv(a) == '--run') {
         SIG_RUN = 1;
-
-        break;
       }
 
       if (argv(a) == '--service') {
         SIG_SVC = 1;
-
-        break;
       }
 
       if (argv(a) == '--stop') {
         SIG_STOP = 1;
-
-        break;
       }
 
       if (argv(a) == '--test') {
         SIG_TEST = 1;
-
-        break;
       }
     }
 
@@ -210,29 +206,17 @@ function main(argc, argv)
 
   if (SIG_INST) {
     Server.install();
-  }
-  
-  if (SIG_RELO) {
+  } else if (SIG_RELO) {
     Server.reload();
-  }
-
-  if (SIG_REMO) {
+  } else if (SIG_REMO) {
     Server.remove();
-  }
-
-  if (SIG_RUN) {
+  } else if (SIG_RUN) {
     Server.run();
-  }
-
-  if (SIG_STOP) {
+  } else if (SIG_STOP) {
     Server.stop();
-  }
-
-  if (SIG_SVC) {
+  } else if (SIG_SVC) {
     Server.service();
-  }
-
-  if (SIG_TEST) {
+  } else if (SIG_TEST) {
     Server.test();
   }
 }
