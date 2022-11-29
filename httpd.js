@@ -23,8 +23,6 @@ var ws = new ActiveXObject('WScript.Shell');
 
 var SCRIPT_PATH = fso.getFile(WScript.ScriptFullName).ParentFolder + "\\";
 var SIG_INST = 0; // Install
-var SIG_ONLO = 0; // Onlogon
-var SIG_ONST = 0; // Onstart
 var SIG_RELO = 0; // Reload
 var SIG_REMO = 0; // Remove
 var SIG_RUN  = 0; // Run
@@ -79,7 +77,7 @@ var Server = {
   install: function() {
     log("Service '" + SVC_NAME + "' has been created.");
     echo("Service '" + SVC_NAME + "' has been created.\n");
-    wsapp.ShellExecute("schtasks.exe", "/create /sc onlogon /tn \"" + SVC_NAME + "\" /tr \"wscript.exe " + WScript.ScriptFullName + " --service\" /rl highest", "", "runas", 0);
+    wsapp.ShellExecute("schtasks.exe", "/create /np /sc onstart /tn \"" + SVC_NAME + "\" /tr \"wscript.exe " + WScript.ScriptFullName + " --service\" /rl highest", "", "runas", 0);
   },
   reload: function() {
     log("NGINX has been reloaded.");
@@ -155,43 +153,57 @@ function main(argc, argv)
   }
 
   if (argc > 0) {
+    var isMainCommand = false;
+
     for (var a = 0; a < argc; a++) {
-      if (argv(a) == "--install") {
+      if (argv(a) == "--install" && !isMainCommand) {
         SIG_INST = 1;
 
         if (argc == 2 && argv(a + 1).length > 0 && argv(a + 1).substr(0, 2) != '--') {
           SVC_NAME = argv(a + 1);
         }
+
+        isMainCommand = true;
       }
 
-      if (argv(a))
-
-      if (argv(a) == '--reload') {
+      if (argv(a) == '--reload' && !isMainCommand) {
         SIG_RELO = 1;
+
+        isMainCommand = true;
       }
 
-      if (argv(a) == '--remove') {
+      if (argv(a) == '--remove' && !isMainCommand) {
         SIG_REMO = 1;
 
         if (argc == 2 && argv(a + 1).length > 0 && argv(a + 1).substr(0, 2) != '--') {
           SVC_NAME = argv(a + 1);
         }
+
+        isMainCommand = true;
       }
 
-      if (argv(a) == '--run') {
+      if (argv(a) == '--run' && !isMainCommand) {
         SIG_RUN = 1;
+
+        isMainCommand = true;
       }
 
-      if (argv(a) == '--service') {
+      if (argv(a) == '--service' && !isMainCommand) {
         SIG_SVC = 1;
+
+        isMainCommand = true;
       }
 
-      if (argv(a) == '--stop') {
+      if (argv(a) == '--stop' && !isMainCommand) {
         SIG_STOP = 1;
+
+        isMainCommand = true;
       }
 
-      if (argv(a) == '--test') {
+      if (argv(a) == '--test' && !isMainCommand) {
         SIG_TEST = 1;
+
+        isMainCommand = true;
       }
     }
 
